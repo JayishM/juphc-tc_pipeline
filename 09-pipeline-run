@@ -1,0 +1,37 @@
+$ tkn pipeline start tax-calculator-pipeline \
+    -w name=pipeline-shared-workspace,claimName=pipeline-pvc \
+    -p git-url="https://github.com/myuser/tax-calculator.git" \
+    -p git-revision="main" \
+    -p image-name="us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest" \
+    --showlog
+
+PipelineRun started: tax-calculator-pipeline-run-7x89q
+Waiting for logs to be available...
+[clone-repo : clone] + ['[' '!' -d /workspace/output/tax-calculator ']' ']'
+[clone-repo : clone] + git clone https://github.com/myuser/tax-calculator.git /workspace/output/
+[clone-repo : clone] Cloning into '/workspace/output'...
+[clone-repo : clone] Successfully cloned git repository at commit 3b1a2c8
+
+[install-dependencies : npm-install] added 2 packages, and audited 3 packages in 1s
+[install-dependencies : npm-install] found 0 vulnerabilities
+
+[run-unit-tests : jasmine-test] Started
+[run-unit-tests : jasmine-test] .......
+[run-unit-tests : jasmine-test] 
+[run-unit-tests : jasmine-test] 7 specs, 0 failures
+[run-unit-tests : jasmine-test] Finished in 0.015 seconds
+
+[build-and-push-image : buildah] STEP 1/6: FROM nginx
+[build-and-push-image : buildah] STEP 2/6: COPY favicon.ico /usr/share/nginx/html/
+[build-and-push-image : buildah] STEP 3/6: COPY index.html /usr/share/nginx/html/
+[build-and-push-image : buildah] STEP 4/6: COPY script.js /usr/share/nginx/html/
+[build-and-push-image : buildah] STEP 5/6: COPY style.css /usr/share/nginx/html/
+[build-and-push-image : buildah] STEP 6/6: COPY taxCalculator.js /usr/share/nginx/html/
+[build-and-push-image : buildah] COMMIT us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+[build-and-push-image : buildah] Getting image source signatures
+[build-and-push-image : buildah] Copying blob sha256:60c686a342ac
+[build-and-push-image : buildah] Writing manifest to image destination
+[build-and-push-image : buildah] Storing list of signatures
+
+PipelineRun tax-calculator-pipeline-run-7x89q completed successfully!
+STATUS: Succeeded (All tasks completed with exit code 0)

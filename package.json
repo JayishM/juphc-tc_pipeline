@@ -1,0 +1,22 @@
+{
+  "name": "tax-calculator",
+  "version": "1.0.0",
+  "description": "Tax Calculator application containerized and deployed with CI/CD Tekton pipeline",
+  "main": "taxCalculator.js",
+  "scripts": {
+    "test": "jasmine",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "tax-calculator",
+    "jasmine",
+    "tekton",
+    "docker",
+    "ibm-cloud"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^4.6.0"
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tax Calculator</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">💼</div>
+      <h1>Tax Calculator</h1>
+      <p class="subtitle">Calculate your income tax, deductions, and take-home pay</p>
+    </header>
+
+    <main class="card">
+      <form id="tax-form">
+        <div class="form-group">
+          <label for="income">Gross Annual Income ($)</label>
+          <input type="number" id="income" placeholder="e.g. 60000" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label for="deductions">Total Deductions ($)</label>
+          <input type="number" id="deductions" placeholder="e.g. 5000" min="0" value="0">
+        </div>
+
+        <button type="submit" id="calculate-btn" class="btn">Calculate Tax</button>
+      </form>
+
+      <div id="results" class="results hidden">
+        <h2>Calculation Summary</h2>
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="label">Taxable Income:</span>
+            <span class="value" id="res-taxable">$0.00</span>
+          </div>
+          <div class="result-item highlight-red">
+            <span class="label">Estimated Tax:</span>
+            <span class="value" id="res-tax">$0.00</span>
+          </div>
+          <div class="result-item highlight-green">
+            <span class="label">Net Take-Home Pay:</span>
+            <span class="value" id="res-net">$0.00</span>
+          </div>
+          <div class="result-item">
+            <span class="label">Effective Tax Rate:</span>
+            <span class="value" id="res-rate">0.00%</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Cloud Native DevOps & CI/CD Project | Powered by Nginx & Tekton</p>
+    </footer>
+  </div>
+
+  <script src="taxCalculator.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

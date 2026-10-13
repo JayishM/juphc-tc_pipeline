@@ -1,0 +1,17 @@
+$ docker run -d -p 8080:80 --name tax-calculator tax-calculator:v1
+9d7a2f1b8c4e0a6d5f3e2b1a8c4e0a6d5f3e2b1a8c4e0a6d5f3e2b1a8c4e0a6d
+
+$ docker ps
+CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS                  NAMES
+9d7a2f1b8c4e   tax-calculator:v1   "/docker-entrypoint.…"   5 seconds ago   Up 4 seconds   0.0.0.0:8080->80/tcp   tax-calculator
+
+$ curl -I http://localhost:8080
+HTTP/1.1 200 OK
+Server: nginx/1.25.3
+Date: Mon, 13 Oct 2026 12:00:00 GMT
+Content-Type: text/html
+Content-Length: 1845
+Last-Modified: Mon, 13 Oct 2026 11:58:00 GMT
+Connection: keep-alive
+ETag: "65293d08-735"
+Accept-Ranges: bytes

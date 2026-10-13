@@ -1,0 +1,28 @@
+$ ibmcloud ce application update --name tax-calculator --image us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+Updating application 'tax-calculator' to image 'us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest'...
+Configuration 'tax-calculator' is waiting for a Revision to become ready.
+Ingress has not yet been reconciled.
+Waiting for load balancer to be ready.
+Application 'tax-calculator' updated.
+Run 'ibmcloud ce application get --name tax-calculator' to check the application status.
+OK
+
+$ ibmcloud ce application get --name tax-calculator
+Getting application 'tax-calculator'...
+OK
+
+Name:          tax-calculator
+ID:            c950b2d2-8a9b-4cde-bf01-123456789abc
+Project Name:  tax-calculator-project
+Age:           4m12s
+Created:       2026-10-13T12:05:00Z
+URL:           https://tax-calculator.1a2b3c4d.us-south.codeengine.appdomain.cloud
+Status:        Ready
+Instances:     1 running, 0 pending, 0 failed
+
+Image:                  us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+Port:                   80
+Scale Min:              1
+Scale Max:              10
+Traffic:
+  100% -> tax-calculator-00002 (latest)
