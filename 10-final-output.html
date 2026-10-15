@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tax Calculator - IBM Cloud Deployed Application</title>
+  <style>
+    :root {
+      --primary: #0f62fe;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #161616;
+      --text-muted: #525252;
+      --border: #e0e0e0;
+      --danger: #da1e28;
+      --success: #24a148;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #2b2e38; padding: 30px; display: flex; justify-content: center; }
+    
+    /* Browser Window Mockup */
+    .browser-frame {
+      width: 1000px;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      border: 1px solid #4a4d56;
+    }
+    .browser-header {
+      background: #eef1f5;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid #d5d9e0;
+    }
+    .browser-dots {
+      display: flex;
+      gap: 8px;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    
+    .address-bar {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #ccd0d8;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      color: #333333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lock-icon { color: #24a148; font-size: 14px; font-weight: bold; }
+    .url-text { font-family: "SF Mono", Menlo, monospace; color: #161616; }
+    .badge-deployed {
+      background: #defbe6;
+      color: #0e6027;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Content Area */
+    .content-viewport {
+      background: var(--bg);
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .calculator-container {
+      width: 100%;
+      max-width: 620px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    header { text-align: center; }
+    .logo { font-size: 40px; margin-bottom: 6px; }
+    h1 { font-size: 28px; color: var(--text); font-weight: 700; }
+    .subtitle { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+    
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+    .input-box {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #b0b8c4;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #161616;
+      background: #fdfdfd;
+    }
+    .btn-row { display: flex; gap: 12px; margin-top: 24px; }
+    .btn {
+      flex: 1;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-calc { background: var(--primary); color: #ffffff; }
+    .btn-reset { background: #e0e0e0; color: #161616; }
+
+    /* Results */
+    .results-section {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .results-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .result-box {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .res-label { font-size: 12px; text-transform: uppercase; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px; }
+    .res-val { font-size: 22px; font-weight: 700; color: var(--text); }
+    .danger .res-val { color: var(--danger); }
+    .success .res-val { color: var(--success); }
+
+    .bracket-info {
+      background: #edf5ff;
+      border-left: 4px solid var(--primary);
+      padding: 14px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #161616;
+    }
+    .bracket-info h4 { margin-bottom: 6px; font-size: 13px; font-weight: 700; }
+    .bracket-info ul { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+    .bracket-info li { display: flex; justify-content: space-between; color: #404040; }
+
+    footer { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="browser-frame">
+    <!-- Browser Top Bar -->
+    <div class="browser-header">
+      <div class="browser-dots">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+      </div>
+      <div class="address-bar">
+        <span class="lock-icon">🔒</span>
+        <span class="url-text">https://tax-calculator.1a2b3c4d.us-south.codeengine.appdomain.cloud</span>
+      </div>
+      <span class="badge-deployed">● IBM Cloud Code Engine Live</span>
+    </div>
+
+    <!-- Web Application Viewport -->
+    <div class="content-viewport">
+      <div class="calculator-container">
+        <header>
+          <div class="logo">💼</div>
+          <h1>Tax Calculator</h1>
+          <p class="subtitle">Cloud-Native Income Tax, Deduction & Take-Home Pay Estimator</p>
+        </header>
+
+        <div class="card">
+          <form onsubmit="return false;">
+            <div class="form-group">
+              <label for="income">Gross Annual Income ($) *</label>
+              <input type="text" id="income" class="input-box" value="60000" readonly>
+            </div>
+
+            <div class="form-group">
+              <label for="deductions">Total Deductions ($)</label>
+              <input type="text" id="deductions" class="input-box" value="5000" readonly>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-calc">Calculate Tax</button>
+              <button class="btn btn-reset">Reset</button>
+            </div>
+          </form>
+
+          <div class="results-section">
+            <h3 class="results-title">Calculation Summary</h3>
+            <div class="grid">
+              <div class="result-box">
+                <span class="res-label">Taxable Income</span>
+                <span class="res-val" id="taxable-income">$55,000.00</span>
+              </div>
+              <div class="result-box danger">
+                <span class="res-label">Taxes Owed (Estimated Tax)</span>
+                <span class="res-val" id="taxes-owed">$6,000.00</span>
+              </div>
+              <div class="result-box success">
+                <span class="res-label">Net Take-Home Pay</span>
+                <span class="res-val" id="net-pay">$49,000.00</span>
+              </div>
+              <div class="result-box">
+                <span class="res-label">Effective Tax Rate</span>
+                <span class="res-val" id="tax-rate">10.00%</span>
+              </div>
+            </div>
+
+            <div class="bracket-info">
+              <h4>Progressive Tax Brackets Applied:</h4>
+              <ul>
+                <li><span>$0 – $10,000 (Tax-Free Allowance)</span><strong>0% ($0.00)</strong></li>
+                <li><span>$10,001 – $40,000 (10% on $30,000)</span><strong>$3,000.00</strong></li>
+                <li><span>$40,001 – $55,000 (20% on $15,000)</span><strong>$3,000.00</strong></li>
+                <li><span>Total Tax Calculated</span><strong>$6,000.00</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <footer>
+          <p>Continuous Deployment Pipeline by Tekton | Powered by IBM Cloud Code Engine</p>
+        </footer>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,7 +1,4 @@
-
-> tax-calculator@1.0.0 test
-> jasmine
-
+npx jasmine
 Started
 .......
 
