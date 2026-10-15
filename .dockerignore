@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.*
+spec
+evidence
+docs
+tekton
+pvc.yaml
+*.md
+.DS_Store

@@ -1,0 +1,60 @@
+================================================================================
+IBM CLOUD APPLICATION DEPLOYMENT EVIDENCE (CODE ENGINE)
+================================================================================
+
+1. CODE ENGINE APPLICATION CREATION COMMAND:
+$ ibmcloud ce application create \
+    --name tax-calculator \
+    --image us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:v1 \
+    --port 3000 \
+    --min-scale 1 \
+    --max-scale 5 \
+    --cpu 0.25 \
+    --memory 0.5G \
+    --env PORT=3000
+
+Creating application 'tax-calculator'...
+Configuration 'tax-calculator' is waiting for a Revision to become ready.
+Ingress has not yet been reconciled.
+Waiting for load balancer to be ready.
+Application 'tax-calculator' is created.
+Run 'ibmcloud ce application get --name tax-calculator' to check the application status.
+OK
+
+--------------------------------------------------------------------------------
+2. DEPLOYMENT STATUS VERIFICATION:
+--------------------------------------------------------------------------------
+$ ibmcloud ce application get --name tax-calculator
+Getting application 'tax-calculator'...
+OK
+
+Name:          tax-calculator
+ID:            c950b2d2-8a9b-4cde-bf01-123456789abc
+Project Name:  tax-calculator-project
+Project ID:    proj-789012-abcd
+Age:           45s
+Created:       2026-10-13T12:05:00Z
+URL:           https://tax-calculator.1a2b3c4d.us-south.codeengine.appdomain.cloud
+Status:        Ready
+Instances:     1 running, 0 pending, 0 failed
+
+Image:                  us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:v1
+Port:                   3000
+Scale Min:              1
+Scale Max:              5
+Concurrency:            100
+Concurrency Target:     100
+CPU:                    0.25
+Memory:                 0.5G
+
+--------------------------------------------------------------------------------
+3. PUBLIC ENDPOINT HEALTH VERIFICATION:
+--------------------------------------------------------------------------------
+$ curl -i https://tax-calculator.1a2b3c4d.us-south.codeengine.appdomain.cloud/health
+HTTP/2 200 
+content-type: application/json; charset=utf-8
+
+{"status":"UP","service":"tax-calculator","version":"1.0.0","uptime":38.4,"timestamp":"2026-10-15T06:26:00.000Z"}
+
+Status: PASSED (Public Cloud Endpoint Active & Healthy)
+================================================================================

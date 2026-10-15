@@ -1,0 +1,10 @@
+
+> tax-calculator@1.0.0 test
+> jasmine
+
+Started
+.......
+
+
+7 specs, 0 failures
+Finished in 0.002 seconds

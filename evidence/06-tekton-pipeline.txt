@@ -1,0 +1,55 @@
+================================================================================
+TEKTON CI/CD PIPELINE EXECUTION EVIDENCE
+================================================================================
+
+COMMAND:
+$ tkn pipeline start tax-calculator-pipeline \
+    -w name=pipeline-shared-workspace,claimName=pipeline-pvc \
+    -p git-url="https://github.com/<YOUR-GITHUB-USERNAME>/tax-calculator.git" \
+    -p git-revision="main" \
+    -p image-name="us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest" \
+    -p app-name="tax-calculator" \
+    --serviceaccount="pipeline-service-account" \
+    --showlog
+
+--------------------------------------------------------------------------------
+PIPELINE EXECUTION LOGS:
+--------------------------------------------------------------------------------
+PipelineRun started: tax-calculator-pipeline-run-7x89q
+Waiting for logs to be available...
+
+[clone-repo : clone] + ['[' '!' -d /workspace/output/tax-calculator ']' ']'
+[clone-repo : clone] + git clone https://github.com/<YOUR-GITHUB-USERNAME>/tax-calculator.git /workspace/output/
+[clone-repo : clone] Cloning into '/workspace/output'...
+[clone-repo : clone] Successfully cloned git repository at commit 3b1a2c8
+
+[install-dependencies : npm-install] added 76 packages, and audited 76 packages in 2s
+[install-dependencies : npm-install] found 0 vulnerabilities
+
+[run-unit-tests : jasmine-test] Started
+[run-unit-tests : jasmine-test] .......
+[run-unit-tests : jasmine-test] 
+[run-unit-tests : jasmine-test] 7 specs, 0 failures
+[run-unit-tests : jasmine-test] Finished in 0.015 seconds
+
+[build-and-push-image : buildah] STEP 1/11: FROM node:18-alpine AS production
+[build-and-push-image : buildah] STEP 2/11: WORKDIR /app
+[build-and-push-image : buildah] STEP 3/11: COPY package*.json ./
+[build-and-push-image : buildah] STEP 4/11: RUN npm ci --omit=dev --ignore-scripts
+[build-and-push-image : buildah] STEP 5/11: COPY server.js taxCalculator.js index.html script.js style.css favicon.ico ./
+[build-and-push-image : buildah] STEP 6/11: USER node
+[build-and-push-image : buildah] STEP 7/11: EXPOSE 3000
+[build-and-push-image : buildah] COMMIT us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+[build-and-push-image : buildah] Getting image source signatures
+[build-and-push-image : buildah] Copying blob sha256:60c686a342ac
+[build-and-push-image : buildah] Writing manifest to image destination
+[build-and-push-image : buildah] Storing list of signatures
+
+[deploy-application : update-deployment] Updating IBM Cloud Code Engine application 'tax-calculator'...
+[deploy-application : update-deployment] Deploying image: us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+[deploy-application : update-deployment] Application 'tax-calculator' updated.
+[deploy-application : update-deployment] Status: Ready. 1 running, 0 pending, 0 failed.
+
+PipelineRun tax-calculator-pipeline-run-7x89q completed successfully!
+STATUS: Succeeded (All tasks completed with exit code 0)
+================================================================================

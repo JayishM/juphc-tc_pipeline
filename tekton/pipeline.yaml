@@ -1,0 +1,85 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: tax-calculator-pipeline
+  description: End-to-end CI/CD pipeline for Tax Calculator (Clone -> Install -> Test -> Build & Push -> Deploy)
+spec:
+  workspaces:
+    - name: pipeline-shared-workspace
+      description: Shared PersistentVolume workspace across all pipeline tasks
+  params:
+    - name: git-url
+      type: string
+      description: The Git repository URL to clone
+    - name: git-revision
+      type: string
+      default: "main"
+      description: The git revision/branch to checkout
+    - name: image-name
+      type: string
+      description: Fully-qualified container image target (e.g., us.icr.io/<NAMESPACE>/tax-calculator:latest)
+    - name: app-name
+      type: string
+      default: "tax-calculator"
+      description: The IBM Cloud Code Engine application name
+  tasks:
+    # Task 1: Source Preparation
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: pipeline-shared-workspace
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+
+    # Task 2: Dependency Installation
+    - name: install-dependencies
+      taskRef:
+        name: npm
+      runAfter:
+        - clone-repo
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-workspace
+
+    # Task 3: Unit Testing (Failing tests will abort the pipeline)
+    - name: run-unit-tests
+      taskRef:
+        name: jasmine
+      runAfter:
+        - install-dependencies
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-workspace
+
+    # Task 4 & 5: Container Build and Push to IBM Cloud Container Registry
+    - name: build-and-push-image
+      taskRef:
+        name: buildah
+      runAfter:
+        - run-unit-tests
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-workspace
+      params:
+        - name: IMAGE
+          value: $(params.image-name)
+
+    # Task 6: Deploy Newly Built Image to IBM Cloud Target
+    - name: deploy-application
+      taskRef:
+        name: deploy-to-ibm-cloud
+      runAfter:
+        - build-and-push-image
+      workspaces:
+        - name: source
+          workspace: pipeline-shared-workspace
+      params:
+        - name: image-name
+          value: $(params.image-name)
+        - name: app-name
+          value: $(params.app-name)

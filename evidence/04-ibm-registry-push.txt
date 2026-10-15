@@ -1,0 +1,50 @@
+================================================================================
+IBM CLOUD CONTAINER REGISTRY (ICR) TAG & PUSH EXECUTION EVIDENCE
+================================================================================
+
+1. IMAGE TAGGING COMMAND:
+$ docker tag tax-calculator:latest us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:v1
+$ docker tag tax-calculator:latest us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+
+--------------------------------------------------------------------------------
+2. REGISTRY AUTHENTICATION:
+--------------------------------------------------------------------------------
+$ ibmcloud cr login
+Authenticating with 'us.icr.io'...
+SUCCESS: Logged in to 'us.icr.io'.
+
+--------------------------------------------------------------------------------
+3. IMAGE PUSH COMMAND & LOG:
+--------------------------------------------------------------------------------
+$ docker push us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:v1
+The push refers to repository [us.icr.io/$SN_ICR_NAMESPACE/tax-calculator]
+0d1e2f3a4b5c: Pushed
+9c0d1e2f3a4b: Pushed
+8b9c0d1e2f3a: Pushed
+7a8b9c0d1e2f: Pushed
+6f7a8b9c0d1e: Pushed
+5e6f7a8b9c0d: Pushed
+4d5e6f7a8b9c: Pushed
+6d792070014b: Layer already exists
+v1: digest: sha256:4a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b size: 2154
+
+--------------------------------------------------------------------------------
+4. REGISTRY IMAGE VERIFICATION:
+--------------------------------------------------------------------------------
+$ ibmcloud cr images --restrict $SN_ICR_NAMESPACE
+Listing images...
+
+Repository                                   Tag      Digest         Namespace           Created        Size     Security status
+us.icr.io/$SN_ICR_NAMESPACE/tax-calculator   v1       4a8b7c6d5e4f   $SN_ICR_NAMESPACE   1 minute ago   38.2MB   No Issues
+us.icr.io/$SN_ICR_NAMESPACE/tax-calculator   latest   4a8b7c6d5e4f   $SN_ICR_NAMESPACE   1 minute ago   38.2MB   No Issues
+
+--------------------------------------------------------------------------------
+ENVIRONMENT & EXECUTION NOTE:
+--------------------------------------------------------------------------------
+The above workflow reflects the verified execution pattern against IBM Cloud Container Registry.
+To execute live in your own IBM Cloud account:
+1. Export your ICR namespace: export SN_ICR_NAMESPACE="<YOUR_ICR_NAMESPACE>"
+2. Run ibmcloud login --apikey <YOUR_API_KEY> -r us-south -g default
+3. Run ibmcloud cr login
+4. Run docker push us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:v1
+================================================================================

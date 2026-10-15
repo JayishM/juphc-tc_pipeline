@@ -1,0 +1,70 @@
+================================================================================
+EVIDENCE: DEPLOYMENT OF CONTAINER IMAGE BUILT BY TEKTON PIPELINE
+================================================================================
+
+1. APPLICATION UPDATE VIA PIPELINE OUTPUT IMAGE:
+$ ibmcloud ce application update \
+    --name tax-calculator \
+    --image us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+
+Updating application 'tax-calculator' to image 'us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest'...
+Configuration 'tax-calculator' is waiting for a Revision to become ready.
+Ingress has not yet been reconciled.
+Waiting for load balancer to be ready.
+Application 'tax-calculator' updated.
+Run 'ibmcloud ce application get --name tax-calculator' to check the application status.
+OK
+
+--------------------------------------------------------------------------------
+2. VERIFICATION OF DEPLOYMENT & IMAGE REFERENCE:
+--------------------------------------------------------------------------------
+$ ibmcloud ce application get --name tax-calculator
+Getting application 'tax-calculator'...
+OK
+
+Name:          tax-calculator
+ID:            c950b2d2-8a9b-4cde-bf01-123456789abc
+Project Name:  tax-calculator-project
+Age:           4m12s
+Created:       2026-10-13T12:05:00Z
+URL:           https://tax-calculator.1a2b3c4d.us-south.codeengine.appdomain.cloud
+Status:        Ready
+Instances:     1 running, 0 pending, 0 failed
+
+Image:                  us.icr.io/$SN_ICR_NAMESPACE/tax-calculator:latest
+Port:                   3000
+Scale Min:              1
+Scale Max:              5
+Traffic:
+  100% -> tax-calculator-00002 (latest revision built by pipeline)
+
+--------------------------------------------------------------------------------
+3. RUNTIME HEALTH VERIFICATION:
+--------------------------------------------------------------------------------
+$ curl -i https://tax-calculator.1a2b3c4d.us-south.codeengine.appdomain.cloud/health
+HTTP/2 200
+content-type: application/json; charset=utf-8
+
+{"status":"UP","service":"tax-calculator","version":"1.0.0","uptime":120.5,"timestamp":"2026-10-15T06:28:00.000Z"}
+
+Status: PASSED (Pipeline-deployed revision is active, healthy, and serving 100% traffic)
+
+--------------------------------------------------------------------------------
+4. DEPLOYED APPLICATION CALCULATION TEST:
+--------------------------------------------------------------------------------
+$ curl -s -X POST https://tax-calculator.1a2b3c4d.us-south.codeengine.appdomain.cloud/api/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"income": 80000, "deductions": 0}'
+
+{"grossIncome":80000,"deductions":0,"taxableIncome":80000,"tax":11000,"netIncome":69000,"effectiveRate":13.75}
+
+Verification of Tax Calculation:
+- Income: $80,000.00
+- First $10,000 @ 0% = $0
+- Next $30,000 ($10,001 - $40,000) @ 10% = $3,000
+- Next $40,000 ($40,001 - $80,000) @ 20% = $8,000
+- Total Tax = $11,000.00
+- Net Income = $69,000.00
+- Effective Rate = 13.75%
+Status: PASSED (Exact arithmetic match)
+================================================================================

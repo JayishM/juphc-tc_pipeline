@@ -1,0 +1,129 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+  description: Clones a GitHub repository revision into the shared workspace
+spec:
+  workspaces:
+    - name: output
+      description: The workspace where repository files will be cloned
+  params:
+    - name: url
+      type: string
+      description: The Git repository URL
+    - name: revision
+      type: string
+      default: "main"
+      description: The git revision or branch
+  steps:
+    - name: clone
+      image: alpine/git:v2.40.1
+      workingDir: $(workspaces.output.path)
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Cloning repository from $(params.url) at revision $(params.revision)..."
+        rm -rf * .[^.]*
+        git clone -b $(params.revision) --single-branch $(params.url) .
+        echo "Git clone completed at commit $(git rev-parse HEAD)"
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: npm
+  description: Installs Node.js dependencies using npm
+spec:
+  workspaces:
+    - name: source
+      description: The workspace containing package.json
+  steps:
+    - name: npm-install
+      image: node:18-alpine
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Installing npm dependencies in $(workspaces.source.path)..."
+        npm install
+        echo "Dependencies successfully installed."
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: jasmine
+  description: Executes Jasmine automated unit tests and halts on failure
+spec:
+  workspaces:
+    - name: source
+      description: The workspace containing test specifications
+  steps:
+    - name: jasmine-test
+      image: node:18-alpine
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Executing Jasmine unit tests..."
+        npm test
+        echo "All Jasmine unit tests passed successfully."
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildah
+  description: Builds a container image and pushes it to IBM Cloud Container Registry using Buildah
+spec:
+  workspaces:
+    - name: source
+      description: The workspace containing Dockerfile and application source
+  params:
+    - name: IMAGE
+      type: string
+      description: The fully qualified container image reference (e.g. us.icr.io/<NAMESPACE>/tax-calculator:latest)
+    - name: DOCKERFILE
+      type: string
+      default: "./Dockerfile"
+      description: Relative path to Dockerfile
+  steps:
+    - name: build-and-push
+      image: quay.io/buildah/stable:v1.31.0
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        privileged: true
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Building container image $(params.IMAGE)..."
+        buildah --storage-driver=vfs bud -t $(params.IMAGE) -f $(params.DOCKERFILE) .
+        echo "Pushing image $(params.IMAGE) to registry..."
+        buildah --storage-driver=vfs push $(params.IMAGE)
+        echo "Image pushed successfully."
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-to-ibm-cloud
+  description: Updates the application deployment on IBM Cloud Code Engine with the newly built image
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: image-name
+      type: string
+      description: The container image reference to deploy
+    - name: app-name
+      type: string
+      default: "tax-calculator"
+      description: IBM Cloud Code Engine application name
+  steps:
+    - name: update-deployment
+      image: icr.io/ibm/ibm-cloud-cli:latest
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Updating IBM Cloud Code Engine application '$(params.app-name)'..."
+        echo "Deploying image: $(params.image-name)"
+        # Note: IBM Cloud authentication performed via mounted service credentials or API key secret
+        ibmcloud ce application update --name $(params.app-name) --image $(params.image-name)
+        echo "Deployment updated successfully."
+        ibmcloud ce application get --name $(params.app-name)

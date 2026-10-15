@@ -3,58 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tax Calculator</title>
+  <title>Tax Calculator | Cloud Native DevOps Project</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="logo">💼</div>
+      <div class="logo-badge">💼</div>
       <h1>Tax Calculator</h1>
-      <p class="subtitle">Calculate your income tax, deductions, and take-home pay</p>
+      <p class="subtitle">Cloud-Native Income Tax, Deduction & Take-Home Pay Estimator</p>
     </header>
 
-    <main class="card">
-      <form id="tax-form">
+    <main class="card main-card">
+      <div id="alert-banner" class="alert-banner hidden" role="alert"></div>
+
+      <form id="tax-form" novalidate>
         <div class="form-group">
-          <label for="income">Gross Annual Income ($)</label>
-          <input type="number" id="income" placeholder="e.g. 60000" min="0" required>
+          <label for="income">Gross Annual Income ($) <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <span class="currency-prefix">$</span>
+            <input 
+              type="number" 
+              id="income" 
+              name="income"
+              placeholder="e.g. 60000" 
+              min="0" 
+              step="any"
+              required
+              aria-describedby="income-hint"
+            >
+          </div>
+          <small id="income-hint" class="hint">Enter total pre-tax earnings for the fiscal year.</small>
         </div>
 
         <div class="form-group">
           <label for="deductions">Total Deductions ($)</label>
-          <input type="number" id="deductions" placeholder="e.g. 5000" min="0" value="0">
+          <div class="input-wrapper">
+            <span class="currency-prefix">$</span>
+            <input 
+              type="number" 
+              id="deductions" 
+              name="deductions"
+              placeholder="e.g. 5000" 
+              min="0" 
+              step="any"
+              value="0"
+              aria-describedby="deductions-hint"
+            >
+          </div>
+          <small id="deductions-hint" class="hint">Standard or itemized eligible pre-tax deductions.</small>
         </div>
 
-        <button type="submit" id="calculate-btn" class="btn">Calculate Tax</button>
+        <div class="button-group">
+          <button type="submit" id="calculate-btn" class="btn btn-primary">
+            Calculate Tax
+          </button>
+          <button type="button" id="reset-btn" class="btn btn-secondary">
+            Reset
+          </button>
+        </div>
       </form>
 
-      <div id="results" class="results hidden">
+      <section id="results" class="results hidden" aria-live="polite">
         <h2>Calculation Summary</h2>
         <div class="result-grid">
           <div class="result-item">
-            <span class="label">Taxable Income:</span>
+            <span class="label">Taxable Income</span>
             <span class="value" id="res-taxable">$0.00</span>
           </div>
           <div class="result-item highlight-red">
-            <span class="label">Estimated Tax:</span>
+            <span class="label">Estimated Tax</span>
             <span class="value" id="res-tax">$0.00</span>
           </div>
           <div class="result-item highlight-green">
-            <span class="label">Net Take-Home Pay:</span>
+            <span class="label">Net Take-Home Pay</span>
             <span class="value" id="res-net">$0.00</span>
           </div>
           <div class="result-item">
-            <span class="label">Effective Tax Rate:</span>
+            <span class="label">Effective Tax Rate</span>
             <span class="value" id="res-rate">0.00%</span>
           </div>
         </div>
-      </div>
+
+        <div class="tax-brackets-info">
+          <h3>Progressive Tax Brackets Applied:</h3>
+          <ul>
+            <li><span>$0 – $10,000</span>: <strong>0%</strong> (Tax-Free Allowance)</li>
+            <li><span>$10,001 – $40,000</span>: <strong>10%</strong></li>
+            <li><span>$40,001 – $80,000</span>: <strong>20%</strong></li>
+            <li><span>Over $80,000</span>: <strong>30%</strong></li>
+          </ul>
+        </div>
+      </section>
     </main>
 
     <footer>
-      <p>Cloud Native DevOps & CI/CD Project | Powered by Nginx & Tekton</p>
+      <p>Cloud Native DevOps & CI/CD Project | IBM Cloud &bull; Tekton &bull; Docker</p>
+      <p class="health-link"><a href="/health" target="_blank" rel="noopener">System Health Endpoint &rarr;</a></p>
     </footer>
   </div>
 
